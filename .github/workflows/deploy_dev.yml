@@ -66,7 +66,10 @@ jobs:
 
       - name: Copy app.env to server
         run: |
-          scp -o StrictHostKeyChecking=no -i ${{ secrets.SSH_KEY }} app.env ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/deployments/telex_doc/app.env
+          echo "${{ secrets.SSH_KEY }}" > ssh_key.pem
+          chmod 600 ssh_key.pem
+          scp -o StrictHostKeyChecking=no -i ssh_key.pem app.env ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/deployments/telex_doc/app.env
+          rm ssh_key.pem
           
   run_docker_container:
     runs-on: self-hosted
@@ -79,11 +82,14 @@ jobs:
     steps:
       - name: Restart containers
         run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_KEY }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} '
+          echo "${{ secrets.SSH_KEY }}" > ssh_key.pem
+            chmod 600 ssh_key.pem
+            ssh -o StrictHostKeyChecking=no -i ssh_key.pem ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} '
             cd ~/deployments/telex_doc
             git reset --hard
             git pull origin dev
             gunzip -c /tmp/telex_be.tar.gz | docker load
             rm -f /tmp/telex_be.tar.gz
             docker compose -f docker-compose.yml up -d
+            rm ssh_key.pem
           '
