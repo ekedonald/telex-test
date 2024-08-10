@@ -8,7 +8,7 @@ on:
 
 jobs:
   build_and_upload_image:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: github.event.repository.fork == false
     env:
       SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
@@ -31,7 +31,7 @@ jobs:
           target: "/tmp"
 
   update_repo_and_create_env:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build_and_upload_image
     if: github.event.repository.fork == false
     env:
@@ -76,7 +76,7 @@ jobs:
           target: "~/deployments/telex_doc"
 
   run_docker_container:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [build_and_upload_image, update_repo_and_create_env]
     if: github.event.repository.fork == false
     env:
