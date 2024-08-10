@@ -85,11 +85,11 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ssh_key.pem
             chmod 600 ssh_key.pem
             ssh -o StrictHostKeyChecking=no -i ssh_key.pem ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} '
+            rm ssh_key.pem
             cd ~/deployments/telex_doc
             git reset --hard
             git pull origin dev
             gunzip -c /tmp/telex_be.tar.gz | docker load
             rm -f /tmp/telex_be.tar.gz
             docker compose -f docker-compose.yml up -d
-            rm ssh_key.pem
           '
