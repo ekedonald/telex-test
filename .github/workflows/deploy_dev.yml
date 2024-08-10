@@ -23,9 +23,11 @@ jobs:
         run: docker save telex_be | gzip > telex_be.tar.gz
       - name: Copy image to server
         run: |
-          scp -o StrictHostKeyChecking=no -i ${{ env.SSH_KEY }} telex_be.tar.gz ${{ env.SSH_USERNAME }}@${{ env.SSH_HOST }}:/tmp/telex_be.tar.gz
+          echo "${{ secrets.SSH_KEY }}" > ssh_key.pem
+          chmod 600 ssh_key.pem
+          scp -o StrictHostKeyChecking=no -i ssh_key.pem telex_be.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/tmp/telex_be.tar.gz
+          rm ssh_key.pem
       
-
   update_repo_and_create_env:
     runs-on: self-hosted
     needs: build_and_upload_image
